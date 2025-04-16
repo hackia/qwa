@@ -1,13 +1,12 @@
 pub mod breathes;
 use crate::breathes::search_breathes;
 use axum::{Router, routing::get};
-use dotenvy::dotenv;
 use serde::Serialize;
 use std::env;
 use tokio_postgres::{Client, Error, NoTls};
 
 pub async fn conn() -> Result<Client, Error> {
-    assert!(dotenv().is_ok());
+    assert!(dotenv::from_filename("/etc/qwa/db.env").is_ok());
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set in .env");
 
     let (client, connection) = tokio_postgres::connect(&db_url, NoTls).await?;
@@ -17,7 +16,6 @@ pub async fn conn() -> Result<Client, Error> {
             eprintln!("connection error: {}", e);
         }
     });
-
     Ok(client)
 }
 

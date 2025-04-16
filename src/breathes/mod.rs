@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct Breath {
-    id: i32 ,
+    id: i32,
     title: String,
     description: String,
     breath: String,
@@ -30,12 +30,14 @@ pub async fn search_breathes(Path(q): Path<String>) -> impl IntoResponse {
         }
     };
 
-    let x = format!("SELECT * FROM breathes WHERE breath LIKE '%{q}%' LIMIT 50");
+    let x = format!(
+        "SELECT * FROM breathes WHERE title LIKE '%{q}%' OR description LIKE '%{q}%' OR author LIKE '%{q}%' OR tags LIKE '%{q}%' OR categories LIKE '%{q}%'",
+    );
 
     let rows = match client.query(x.as_str(), &[]).await {
         Ok(r) => r,
         Err(e) => {
-            println!("Erreur {e}");
+            println!("Error {e}");
             return (StatusCode::INTERNAL_SERVER_ERROR, Json(vec![]));
         }
     };
